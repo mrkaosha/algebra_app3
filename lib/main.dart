@@ -257,13 +257,14 @@ class GridPainter extends CustomPainter {
         Offset(xv, _canvasHeight),
         paint,
       );
+      // Draw the numbers
       final TextPainter textPainter = TextPainter(
-        text: TextSpan(text: i.toString()),
+        text: TextSpan(text: (i-10).toString()),
         textAlign: TextAlign.right,
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: size.width * 0.1);
-      textPainter.paint(canvas, Offset(xv - 4, _canvasHeight + 5));
-      textPainter.paint(canvas, Offset(-20, _canvasHeight - i * _gridSize - 6));
+      textPainter.paint(canvas, Offset(xv - 7, _canvasHeight/2.0 + 5)); // x-axis labels
+      textPainter.paint(canvas, Offset(-20 + _canvasWidth/2.0, _canvasHeight - i * _gridSize - 7)); // y-axis labels
 
       canvas.drawLine(
         Offset(0.0, yh),
@@ -281,7 +282,8 @@ class GridPainter extends CustomPainter {
                 ))
               }
           });
-    }
+    } // end for loop
+    
     final TextPainter textPainterY = TextPainter(
       text: const TextSpan(text: "y"),
       textAlign: TextAlign.right,
@@ -289,8 +291,8 @@ class GridPainter extends CustomPainter {
     )..layout(maxWidth: size.width * 0.1);
     // thick line for y-axis
     canvas.drawLine(
-      Offset(0.0, -.05 * _canvasWidth),
-      Offset(0.0, _canvasHeight),
+      Offset(_canvasWidth/2.0, -.05 * _canvasWidth),
+      Offset(_canvasWidth/2.0, _canvasHeight),
       paintAxes,
     );
     textPainterY.paint(canvas, const Offset(-5.0, -45.0));
@@ -302,8 +304,8 @@ class GridPainter extends CustomPainter {
     )..layout(maxWidth: size.width * 0.1);
     // thick line for x-axis
     canvas.drawLine(
-      Offset(0.0, _canvasHeight),
-      Offset(_canvasWidth * 1.05, _canvasHeight),
+      Offset(0.0, _canvasHeight/2.0),
+      Offset(_canvasWidth * 1.05, _canvasHeight/2.0),
       paintAxes,
     );
     textPainterX.paint(canvas, Offset(_canvasWidth + 30, _canvasHeight - 10));
