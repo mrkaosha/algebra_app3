@@ -252,9 +252,17 @@ class GridPainter extends CustomPainter {
     for (int i = 0; i <= (_canvasHeight/_gridSize as int); i++) {
       xv = _gridSize * i;
       yh = _gridSize * i;
+
+      //drawing the vertical grid line
       canvas.drawLine(
         Offset(xv, -.05 * _canvasWidth),
         Offset(xv, _canvasHeight),
+        paint,
+      );
+      //drawing the horizontal grid line
+      canvas.drawLine(
+        Offset(0.0, yh),
+        Offset(_canvasWidth * 1.05, yh),
         paint,
       );
       // Draw the numbers
@@ -266,11 +274,6 @@ class GridPainter extends CustomPainter {
       textPainter.paint(canvas, Offset(xv - 7, _canvasHeight/2.0 + 5)); // x-axis labels
       textPainter.paint(canvas, Offset(-20 + _canvasWidth/2.0, _canvasHeight - i * _gridSize - 7)); // y-axis labels
 
-      canvas.drawLine(
-        Offset(0.0, yh),
-        Offset(_canvasWidth * 1.05, yh),
-        paint,
-      );
       // grab the dots for the data points
       var r = _gridData[i];
       r.asMap().forEach((index, d) => {
@@ -284,6 +287,19 @@ class GridPainter extends CustomPainter {
           });
     } // end for loop
     
+//    //drawing the vertical grid line
+//    canvas.drawLine(
+//      Offset(_canvasWidth+40, -.05 * _canvasWidth),
+//      Offset(_canvasWidth+40, _canvasHeight),
+//      paint,
+//    );
+//    //drawing the horizontal grid line
+//    canvas.drawLine(
+//      Offset(0.0, 0.0),
+//      Offset(_canvasWidth * 1.05, 0.0),
+//      paint,
+//    );
+
     final TextPainter textPainterY = TextPainter(
       text: const TextSpan(text: "y"),
       textAlign: TextAlign.right,
