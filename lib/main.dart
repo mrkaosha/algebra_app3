@@ -15948,7 +15948,6 @@ class _StdToSlopeIntData {
       coeffs.add({'num': num[i], 'den': den[i], 'yint': yint[i]});
     }
     coeffs.shuffle();
-    print(coeffs.where((i) => i['yint'].abs() == 4).toList());
   }
 
   Map getNextEquation() {
