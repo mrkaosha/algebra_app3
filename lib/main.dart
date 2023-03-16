@@ -72,17 +72,21 @@ class _MainAppState extends State<MainApp> {
   bool checkAnswer() {
     bool correct = true;
     int numPoints = 0;
+    double offset = -10.0;
     for (int i = 0; i <= (canvasHeight / gridSize as int); i++) {
       // grab the dots for the data points
       var r = dataList[i];
       r.asMap().forEach((index, d) {
         if (d) {
           numPoints++;
+          print((i + offset) * currentEquation['den']);
+          print(currentEquation['num'] * (index + offset) +
+              currentEquation['yint'] * currentEquation['den']);
         }
         if (d &&
-            (i !=
-                currentEquation['slope'] * index +
-                    currentEquation['yIntercept'])) {
+            ((i + offset) * currentEquation['den'] !=
+                currentEquation['num'] * (index + offset) +
+                    currentEquation['yint'] * currentEquation['den'])) {
           correct = false;
         }
       });
@@ -93,24 +97,27 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    /*********
-     * this section needs fixing
-     * 1. the denominator needs to shoe (use catex?)
-     * 2. The yintercept can now be negative so account for + and - signs there
-     * 3. 
-     * 
-     * **********/
-    String eqnString = "y = ";
-    eqnString += currentEquation['num'].sign < 0 ? "−" : "";
-
-    eqnString += currentEquation['num'].abs() != 1
+    String eqnString = "";
+    eqnString += (-1 * currentEquation['num']).sign < 0 ? "−" : "";
+    eqnString += (-1 * currentEquation['num']).abs() != 1
         ? currentEquation['num'].abs().toString()
         : "";
 
     eqnString += "x";
 
+    eqnString += (currentEquation['den']).sign < 0 ? " − " : " + ";
+    eqnString += (currentEquation['den']).abs() != 1
+        ? currentEquation['den'].abs().toString()
+        : "";
+
+    eqnString += "y = ";
+
+    eqnString += (currentEquation['den'] * currentEquation['yint']).sign < 0
+        ? "−"
+        : "";
     eqnString +=
-        currentEquation['yint'] != 0 ? " + ${currentEquation['yint']}" : "";
+        (currentEquation['den'] * currentEquation['yint']).abs().toString();
+    eqnString += ":";
 
     var theme = Theme.of(context);
 
@@ -152,6 +159,7 @@ class _MainAppState extends State<MainApp> {
               ActionButtons(
                 checkAnswer: checkAnswer,
                 nextEquation: nextEquation,
+                currentEquation: currentEquation,
               ),
               TextButton(
                 onPressed: () {
@@ -186,8 +194,12 @@ class _MainAppState extends State<MainApp> {
 class ActionButtons extends StatelessWidget {
   final dynamic checkAnswer;
   final dynamic nextEquation;
+  final dynamic currentEquation;
   const ActionButtons(
-      {required this.checkAnswer, required this.nextEquation, super.key});
+      {required this.checkAnswer,
+      required this.nextEquation,
+      required this.currentEquation,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -200,7 +212,9 @@ class ActionButtons extends StatelessWidget {
             showDialog<String>(
               context: context,
               builder: (BuildContext context) => AlertDialog(
-                content: Text(correct ? "Correct!" : "Incorrect"),
+                content: Text(correct
+                    ? "Correct!"
+                    : "Incorrect, make sure your slope is ${currentEquation['num']}/${currentEquation['den']} or equivalent"),
                 actions: <Widget>[
                   TextButton(
                     onPressed: () => Navigator.pop(context),
