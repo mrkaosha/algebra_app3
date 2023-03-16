@@ -13,7 +13,6 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-
   double x = 0.0;
   double y = 0.0;
   double canvasWidth = 400;
@@ -34,9 +33,9 @@ class _MainAppState extends State<MainApp> {
 
   void _resetDataList() {
     dataList = List.generate(
-      (canvasHeight/gridSize as int) + 1,
+      (canvasHeight / gridSize as int) + 1,
       (i) => List.generate(
-        (canvasWidth/gridSize as int) + 1,
+        (canvasWidth / gridSize as int) + 1,
         (j) => false,
         growable: false,
       ),
@@ -73,7 +72,7 @@ class _MainAppState extends State<MainApp> {
   bool checkAnswer() {
     bool correct = true;
     int numPoints = 0;
-    for (int i = 0; i <= (canvasHeight/gridSize as int); i++) {
+    for (int i = 0; i <= (canvasHeight / gridSize as int); i++) {
       // grab the dots for the data points
       var r = dataList[i];
       r.asMap().forEach((index, d) {
@@ -94,7 +93,6 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-
     /*********
      * this section needs fixing
      * 1. the denominator needs to shoe (use catex?)
@@ -111,9 +109,8 @@ class _MainAppState extends State<MainApp> {
 
     eqnString += "x";
 
-    eqnString += currentEquation['yint'] != 0
-        ? " + ${currentEquation['yint']}"
-        : "";
+    eqnString +=
+        currentEquation['yint'] != 0 ? " + ${currentEquation['yint']}" : "";
 
     var theme = Theme.of(context);
 
@@ -123,9 +120,12 @@ class _MainAppState extends State<MainApp> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                "Graph $eqnString",
-                style: const TextStyle(fontSize: 18),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  "Graph $eqnString",
+                  style: const TextStyle(fontSize: 18),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.all(30.0),
@@ -142,8 +142,8 @@ class _MainAppState extends State<MainApp> {
                       height: canvasHeight,
                       child: CustomPaint(
                         foregroundPainter: CursorPainter(x, y, drawCursor),
-                        painter:
-                            GridPainter(canvasWidth, canvasHeight, gridSize, dataList),
+                        painter: GridPainter(
+                            canvasWidth, canvasHeight, gridSize, dataList),
                       ),
                     ),
                   ),
@@ -249,30 +249,36 @@ class GridPainter extends CustomPainter {
     double yh = 0.0;
     List<Offset> dataPoints = [];
 
-    for (int i = 0; i <= (_canvasHeight/_gridSize as int); i++) {
+    for (int i = 0; i <= (_canvasHeight / _gridSize as int); i++) {
       xv = _gridSize * i;
       yh = _gridSize * i;
 
       //drawing the vertical grid line
       canvas.drawLine(
         Offset(xv, -.05 * _canvasWidth),
-        Offset(xv, _canvasHeight),
+        Offset(xv, _canvasHeight * 1.05),
         paint,
       );
       //drawing the horizontal grid line
       canvas.drawLine(
-        Offset(0.0, yh),
+        Offset(-0.05 * _canvasWidth, yh),
         Offset(_canvasWidth * 1.05, yh),
         paint,
       );
       // Draw the numbers
       final TextPainter textPainter = TextPainter(
-        text: TextSpan(text: (i-10).toString()),
-        textAlign: TextAlign.right,
+        text: TextSpan(text: (i - 10).toString()),
+        textAlign: TextAlign.justify,
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: size.width * 0.1);
-      textPainter.paint(canvas, Offset(xv - 7, _canvasHeight/2.0 + 5)); // x-axis labels
-      textPainter.paint(canvas, Offset(-20 + _canvasWidth/2.0, _canvasHeight - i * _gridSize - 7)); // y-axis labels
+      textPainter.paint(
+        canvas,
+        Offset(xv - 7, _canvasHeight / 2.0 + 5),
+      ); // x-axis labels
+      textPainter.paint(
+        canvas,
+        Offset(-20 + _canvasWidth / 2.0, _canvasHeight - i * _gridSize - 7),
+      ); // y-axis labels
 
       // grab the dots for the data points
       var r = _gridData[i];
@@ -286,19 +292,6 @@ class GridPainter extends CustomPainter {
               }
           });
     } // end for loop
-    
-//    //drawing the vertical grid line
-//    canvas.drawLine(
-//      Offset(_canvasWidth+40, -.05 * _canvasWidth),
-//      Offset(_canvasWidth+40, _canvasHeight),
-//      paint,
-//    );
-//    //drawing the horizontal grid line
-//    canvas.drawLine(
-//      Offset(0.0, 0.0),
-//      Offset(_canvasWidth * 1.05, 0.0),
-//      paint,
-//    );
 
     final TextPainter textPainterY = TextPainter(
       text: const TextSpan(text: "y"),
@@ -307,11 +300,14 @@ class GridPainter extends CustomPainter {
     )..layout(maxWidth: size.width * 0.1);
     // thick line for y-axis
     canvas.drawLine(
-      Offset(_canvasWidth/2.0, -.05 * _canvasWidth),
-      Offset(_canvasWidth/2.0, _canvasHeight),
+      Offset(_canvasWidth / 2.0, -.05 * _canvasWidth),
+      Offset(_canvasWidth / 2.0, _canvasHeight * 1.05),
       paintAxes,
     );
-    textPainterY.paint(canvas, const Offset(-5.0, -45.0));
+    textPainterY.paint(
+      canvas,
+      Offset(_canvasWidth / 2.0, -45.0),
+    ); // draw label for y-axis
 
     final TextPainter textPainterX = TextPainter(
       text: const TextSpan(text: "x"),
@@ -320,11 +316,14 @@ class GridPainter extends CustomPainter {
     )..layout(maxWidth: size.width * 0.1);
     // thick line for x-axis
     canvas.drawLine(
-      Offset(0.0, _canvasHeight/2.0),
-      Offset(_canvasWidth * 1.05, _canvasHeight/2.0),
+      Offset(_canvasWidth * -.05, _canvasHeight / 2.0),
+      Offset(_canvasWidth * 1.05, _canvasHeight / 2.0),
       paintAxes,
     );
-    textPainterX.paint(canvas, Offset(_canvasWidth + 30, _canvasHeight - 10));
+    textPainterX.paint(
+      canvas,
+      Offset(_canvasWidth + 30, _canvasHeight / 2.0),
+    ); // draw the label for x-axis
 
     var paint1 = Paint()
       ..color = Colors.red
@@ -15931,7 +15930,6 @@ class _StdToSlopeIntData {
     print(coeffs.where((i) => i['yint'].abs() == 4).toList());
   }
 
-  
   Map getNextEquation() {
     if (currentEquation == coeffs.length) {
       coeffs.shuffle();
