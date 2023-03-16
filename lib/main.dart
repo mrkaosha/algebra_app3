@@ -112,9 +112,8 @@ class _MainAppState extends State<MainApp> {
 
     eqnString += "y = ";
 
-    eqnString += (currentEquation['den'] * currentEquation['yint']).sign < 0
-        ? "−"
-        : "";
+    eqnString +=
+        (currentEquation['den'] * currentEquation['yint']).sign < 0 ? "−" : "";
     eqnString +=
         (currentEquation['den'] * currentEquation['yint']).abs().toString();
     eqnString += ":";
@@ -214,7 +213,7 @@ class ActionButtons extends StatelessWidget {
               builder: (BuildContext context) => AlertDialog(
                 content: Text(correct
                     ? "Correct!"
-                    : "Incorrect, make sure your slope is ${currentEquation['num']}/${currentEquation['den']} or equivalent"),
+                    : "Incorrect, make sure your slope is ${currentEquation['num']}/${currentEquation['den']} or ${currentEquation['num'] * -1}/${currentEquation['den'] * -1} or a reduced fraction form of either"),
                 actions: <Widget>[
                   TextButton(
                     onPressed: () => Navigator.pop(context),
