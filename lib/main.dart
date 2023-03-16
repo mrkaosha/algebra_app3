@@ -15,9 +15,9 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   double x = 0.0;
   double y = 0.0;
-  double canvasWidth = 400;
-  double canvasHeight = 400;
-  double gridSize = 20;
+  double canvasWidth = 500;
+  double canvasHeight = 500;
+  double gridSize = 25;
   _StdToSlopeIntData eqns = _StdToSlopeIntData();
   Map currentEquation = {};
   bool drawCursor = false;
@@ -47,7 +47,7 @@ class _MainAppState extends State<MainApp> {
     setState(() {
       x = (details.localPosition.dx / gridSize).round() * gridSize;
       y = (details.localPosition.dy / gridSize).round() * gridSize;
-      drawCursor = true;
+      drawCursor = false;
     });
     //print((x/40).toString() + ", " + ((400-y)/40).toString());
   }
@@ -122,57 +122,65 @@ class _MainAppState extends State<MainApp> {
 
     return MaterialApp(
       home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
+        body: ListView(
+          children: [
+            Align(
+              child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Text(
                   "Graph $eqnString",
                   style: const TextStyle(fontSize: 18),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(30.0),
-                child: MouseRegion(
-                  onHover: _updateLocation,
-                  onExit: (p) {
-                    setState(() => drawCursor = false);
-                  },
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTapDown: _toggleDataPoint,
-                    child: SizedBox(
-                      width: canvasWidth,
-                      height: canvasHeight,
-                      child: CustomPaint(
-                        foregroundPainter: CursorPainter(x, y, drawCursor),
-                        painter: GridPainter(
-                            canvasWidth, canvasHeight, gridSize, dataList),
+            ),
+            Align(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Padding(
+                  padding: const EdgeInsets.all(40.0),
+                  child: SizedBox(
+                    width: canvasWidth,
+                    height: canvasHeight,
+                    child: MouseRegion(
+                      onHover: _updateLocation,
+                      onExit: (p) {
+                        setState(() => drawCursor = false);
+                      },
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTapDown: _toggleDataPoint,
+                        child: CustomPaint(
+                          foregroundPainter: CursorPainter(x, y, drawCursor),
+                          painter: GridPainter(
+                              canvasWidth, canvasHeight, gridSize, dataList),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-              ActionButtons(
+            ),
+            Align(
+              child: ActionButtons(
                 checkAnswer: checkAnswer,
                 nextEquation: nextEquation,
                 currentEquation: currentEquation,
               ),
-              TextButton(
-                onPressed: () {
-                  setState(() => _resetDataList());
-                },
-                child: const Text("Clear graph"),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(20.0),
-              ),
-              Card(
-                color: theme.colorScheme.primary,
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() => _resetDataList());
+              },
+              child: const Text("Clear graph"),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 240.0),
+            ),
+            Card(
+              color: theme.colorScheme.primary,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Align(
                   child: Text(
                     "South Hills Academy",
                     style: TextStyle(
@@ -182,8 +190,8 @@ class _MainAppState extends State<MainApp> {
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
