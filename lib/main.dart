@@ -18,6 +18,7 @@ class _MainAppState extends State<MainApp> {
   double canvasWidth = 500;
   double canvasHeight = 500;
   double gridSize = 25;
+  double margins = 0.05; //the margin size as a percent of canvasWidth
   _StdToSlopeIntData eqns = _StdToSlopeIntData();
   Map currentEquation = {};
   bool drawCursor = false;
@@ -47,7 +48,7 @@ class _MainAppState extends State<MainApp> {
     setState(() {
       x = (details.localPosition.dx / gridSize).round() * gridSize;
       y = (details.localPosition.dy / gridSize).round() * gridSize;
-      drawCursor = false;
+      drawCursor = true;
     });
     //print((x/40).toString() + ", " + ((400-y)/40).toString());
   }
@@ -139,8 +140,8 @@ class _MainAppState extends State<MainApp> {
                 child: Padding(
                   padding: const EdgeInsets.all(40.0),
                   child: SizedBox(
-                    width: canvasWidth,
-                    height: canvasHeight,
+                    width: canvasWidth*(1.0+margins*2),
+                    height: canvasHeight*(1.0+margins*2),
                     child: MouseRegion(
                       onHover: _updateLocation,
                       onExit: (p) {
@@ -151,8 +152,17 @@ class _MainAppState extends State<MainApp> {
                         onTapDown: _toggleDataPoint,
                         child: CustomPaint(
                           foregroundPainter: CursorPainter(x, y, drawCursor),
+                          /**
+                           * To do: add the margins into the GridPainter
+                           * also the gesture detector needs to know the margins to
+                           * trim them off the edges
+                           * x, y = clickEvent offset minus the margin size
+                           * there needs to be a flag to detect when the cursor/clickEvent
+                           * is in the margins (if outside the left margin set x = 0 + offest, if
+                           * outside the top margin set y = height/gridSize + offset)
+                           */
                           painter: GridPainter(
-                              canvasWidth, canvasHeight, gridSize, dataList),
+                              canvasWidth, canvasHeight, gridSize, margins, dataList),
                         ),
                       ),
                     ),
@@ -248,13 +258,15 @@ class GridPainter extends CustomPainter {
   double _canvasWidth = 0.0;
   double _canvasHeight = 0.0;
   double _gridSize = 0.0;
+  double _margin = 0.0;
   late List<List<bool>> _gridData;
 
-  GridPainter(width, height, gridSize, gridData) {
+  GridPainter(width, height, gridSize, margin, gridData) {
     _canvasWidth = width;
     _canvasHeight = height;
     _gridData = gridData;
     _gridSize = gridSize;
+    _margin = margin;
   }
 
   @override
@@ -271,19 +283,19 @@ class GridPainter extends CustomPainter {
     List<Offset> dataPoints = [];
 
     for (int i = 0; i <= (_canvasHeight / _gridSize as int); i++) {
-      xv = _gridSize * i;
-      yh = _gridSize * i;
+      xv = _gridSize * i + _margin*_canvasWidth;
+      yh = _gridSize * i + _margin*_canvasHeight;
 
       //drawing the vertical grid line
       canvas.drawLine(
-        Offset(xv, -.05 * _canvasWidth),
-        Offset(xv, _canvasHeight * 1.05),
+        Offset(xv, 0),
+        Offset(xv, _canvasHeight*(1+2*_margin)),
         paint,
       );
       //drawing the horizontal grid line
       canvas.drawLine(
-        Offset(-0.05 * _canvasWidth, yh),
-        Offset(_canvasWidth * 1.05, yh),
+        Offset(0, yh),
+        Offset(_canvasWidth*(1+2*_margin), yh),
         paint,
       );
       // Draw the numbers
@@ -292,9 +304,12 @@ class GridPainter extends CustomPainter {
         textAlign: TextAlign.justify,
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: size.width * 0.1);
+      /**
+       * THIS IS STILL BROKEN
+       */
       textPainter.paint(
         canvas,
-        Offset(xv - 7, _canvasHeight / 2.0 + 5),
+        Offset(xv - 7 + _margin*_canvasWidth, _canvasHeight / 2.0 + 5),
       ); // x-axis labels
       textPainter.paint(
         canvas,
