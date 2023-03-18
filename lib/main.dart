@@ -54,10 +54,15 @@ class _MainAppState extends State<MainApp> {
   }
 
   void _toggleDataPoint(TapDownDetails details) {
-    x = (details.localPosition.dx / gridSize).round() * gridSize;
-    y = (details.localPosition.dy / gridSize).round() * gridSize;
+    x = ((details.localPosition.dx - margins * canvasWidth) / gridSize)
+            .round() *
+        gridSize;
+    y = ((details.localPosition.dy - margins * canvasHeight) / gridSize)
+            .round() *
+        gridSize;
     int i = ((canvasWidth - y) / gridSize) as int;
     int j = x / gridSize as int;
+    print("${i}, ${j}");
     setState(() {
       dataList[i][j] ? dataList[i][j] = false : dataList[i][j] = true;
       drawCursor = false;
@@ -73,7 +78,8 @@ class _MainAppState extends State<MainApp> {
   bool checkAnswer() {
     bool correct = true;
     int numPoints = 0;
-    double offset = -10.0;
+    double offset =
+        -10.0; // ****should I put this offset in the class global variables?****
     for (int i = 0; i <= (canvasHeight / gridSize as int); i++) {
       // grab the dots for the data points
       var r = dataList[i];
@@ -140,8 +146,8 @@ class _MainAppState extends State<MainApp> {
                 child: Padding(
                   padding: const EdgeInsets.all(40.0),
                   child: SizedBox(
-                    width: canvasWidth*(1.0+margins*2),
-                    height: canvasHeight*(1.0+margins*2),
+                    width: canvasWidth * (1.0 + margins * 2),
+                    height: canvasHeight * (1.0 + margins * 2),
                     child: MouseRegion(
                       onHover: _updateLocation,
                       onExit: (p) {
@@ -161,8 +167,8 @@ class _MainAppState extends State<MainApp> {
                            * is in the margins (if outside the left margin set x = 0 + offest, if
                            * outside the top margin set y = height/gridSize + offset)
                            */
-                          painter: GridPainter(
-                              canvasWidth, canvasHeight, gridSize, margins, dataList),
+                          painter: GridPainter(canvasWidth, canvasHeight,
+                              gridSize, margins, dataList),
                         ),
                       ),
                     ),
@@ -283,19 +289,19 @@ class GridPainter extends CustomPainter {
     List<Offset> dataPoints = [];
 
     for (int i = 0; i <= (_canvasHeight / _gridSize as int); i++) {
-      xv = _gridSize * i + _margin*_canvasWidth;
-      yh = _gridSize * i + _margin*_canvasHeight;
+      xv = _gridSize * i + _margin * _canvasWidth;
+      yh = _gridSize * i + _margin * _canvasHeight;
 
       //drawing the vertical grid line
       canvas.drawLine(
         Offset(xv, 0),
-        Offset(xv, _canvasHeight*(1+2*_margin)),
+        Offset(xv, _canvasHeight * (1 + 2 * _margin)),
         paint,
       );
       //drawing the horizontal grid line
       canvas.drawLine(
         Offset(0, yh),
-        Offset(_canvasWidth*(1+2*_margin), yh),
+        Offset(_canvasWidth * (1 + 2 * _margin), yh),
         paint,
       );
       // Draw the numbers
@@ -304,16 +310,23 @@ class GridPainter extends CustomPainter {
         textAlign: TextAlign.justify,
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: size.width * 0.1);
-      /**
-       * THIS IS STILL BROKEN
-       */
+
       textPainter.paint(
         canvas,
-        Offset(xv - 7 + _margin*_canvasWidth, _canvasHeight / 2.0 + 5),
+        Offset(
+          xv - 7,
+          _canvasHeight / 2.0 + 5 + _margin * _canvasHeight,
+        ),
       ); // x-axis labels
+
       textPainter.paint(
         canvas,
-        Offset(-20 + _canvasWidth / 2.0, _canvasHeight - i * _gridSize - 7),
+        Offset(
+          -20 + _canvasWidth / 2.0 + _margin * _canvasHeight,
+          _canvasHeight * (1 + 2 * _margin) - yh - 7,
+          // this last calculation is awkward but the first y label is -10 and
+          // the last is +10, so what to do here...
+        ),
       ); // y-axis labels
 
       // grab the dots for the data points
@@ -322,8 +335,8 @@ class GridPainter extends CustomPainter {
             if (d)
               {
                 dataPoints.add(Offset(
-                  index * _gridSize,
-                  _canvasWidth - i * _gridSize,
+                  index * _gridSize + _margin * _canvasWidth,
+                  _canvasWidth - i * _gridSize + _margin * _canvasHeight,
                 ))
               }
           });
@@ -336,13 +349,23 @@ class GridPainter extends CustomPainter {
     )..layout(maxWidth: size.width * 0.1);
     // thick line for y-axis
     canvas.drawLine(
-      Offset(_canvasWidth / 2.0, -.05 * _canvasWidth),
-      Offset(_canvasWidth / 2.0, _canvasHeight * 1.05),
+      Offset(
+        _canvasWidth / 2.0 + _margin * _canvasHeight,
+        -.05 * _canvasWidth + _margin * _canvasHeight,
+      ),
+      Offset(
+        _canvasWidth / 2.0 + _margin * _canvasHeight,
+        _canvasHeight * 1.05 + _margin * _canvasHeight,
+        // change the 1.05 to margin + 1?
+      ),
       paintAxes,
     );
     textPainterY.paint(
       canvas,
-      Offset(_canvasWidth / 2.0, -45.0),
+      Offset(
+        _canvasWidth / 2.0 + _margin * _canvasHeight,
+        -45.0 + _margin * _canvasHeight,
+      ),
     ); // draw label for y-axis
 
     final TextPainter textPainterX = TextPainter(
@@ -352,13 +375,22 @@ class GridPainter extends CustomPainter {
     )..layout(maxWidth: size.width * 0.1);
     // thick line for x-axis
     canvas.drawLine(
-      Offset(_canvasWidth * -.05, _canvasHeight / 2.0),
-      Offset(_canvasWidth * 1.05, _canvasHeight / 2.0),
+      Offset(
+        _canvasWidth * -.05 + _margin * _canvasHeight,
+        _canvasHeight / 2.0 + _margin * _canvasHeight,
+      ),
+      Offset(
+        _canvasWidth * 1.05 + _margin * _canvasHeight,
+        _canvasHeight / 2.0 + _margin * _canvasHeight,
+      ),
       paintAxes,
     );
     textPainterX.paint(
       canvas,
-      Offset(_canvasWidth + 30, _canvasHeight / 2.0),
+      Offset(
+        _canvasWidth + 30 + _margin * _canvasHeight,
+        _canvasHeight / 2.0 + _margin * _canvasHeight,
+      ),
     ); // draw the label for x-axis
 
     var paint1 = Paint()
