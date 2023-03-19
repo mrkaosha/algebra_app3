@@ -316,6 +316,8 @@ class GridPainter extends CustomPainter {
 
     double xv = 0.0;
     double yh = 0.0;
+    double verticalHeight = _canvasHeight * (1 + 2 * _margin);
+    double horizontalLength = _canvasWidth * (1 + 2 * _margin);
     List<Offset> dataPoints = [];
 
     for (int i = 0; i <= (_canvasHeight / _gridSize as int); i++) {
@@ -325,13 +327,13 @@ class GridPainter extends CustomPainter {
       //drawing the vertical grid line
       canvas.drawLine(
         Offset(xv, 0),
-        Offset(xv, _canvasHeight * (1 + 2 * _margin)),
+        Offset(xv, verticalHeight), // **** REFACTOR
         paint,
       );
       //drawing the horizontal grid line
       canvas.drawLine(
         Offset(0, yh),
-        Offset(_canvasWidth * (1 + 2 * _margin), yh),
+        Offset(horizontalLength, yh), // **** REFACTOR
         paint,
       );
       // Draw the numbers
@@ -353,7 +355,7 @@ class GridPainter extends CustomPainter {
         canvas,
         Offset(
           -20 + _canvasWidth / 2.0 + _yMargin,
-          _canvasHeight * (1 + 2 * _margin) - yh - 7,
+          verticalHeight - yh - 7,
           // this last calculation is awkward but the first y label is -10 and
           // the last is +10, so what to do here...
         ),
@@ -385,8 +387,7 @@ class GridPainter extends CustomPainter {
       ),
       Offset(
         _canvasWidth / 2.0 + _yMargin,
-        _canvasHeight + 2 * _yMargin,
-        // change the 1.05 to margin + 1?
+        verticalHeight,
       ),
       paintAxes,
     );
@@ -410,7 +411,7 @@ class GridPainter extends CustomPainter {
         _canvasHeight / 2.0 + _yMargin,
       ),
       Offset(
-        _canvasWidth + 2 * _yMargin,
+        horizontalLength,
         _canvasHeight / 2.0 + _yMargin,
       ),
       paintAxes,
