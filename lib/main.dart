@@ -47,8 +47,18 @@ class _MainAppState extends State<MainApp> {
   void _updateLocation(PointerEvent details) {
     setState(() {
       x = (details.localPosition.dx / gridSize).round() * gridSize;
+      if (x < margins * canvasWidth) {
+        x = margins * canvasWidth;
+      } else if (x > canvasWidth * (1 + margins)) {
+        x = canvasWidth * (1 + margins);
+      }
       y = (details.localPosition.dy / gridSize).round() * gridSize;
-      drawCursor = true;
+      if (y < margins * canvasHeight) {
+        y = margins * canvasHeight;
+      } else if (y > canvasHeight * (1 + margins)) {
+        y = canvasHeight * (1 + margins);
+      }
+      drawCursor = false;
     });
     //print((x/40).toString() + ", " + ((400-y)/40).toString());
   }
@@ -61,8 +71,18 @@ class _MainAppState extends State<MainApp> {
             .round() *
         gridSize;
     int i = ((canvasWidth - y) / gridSize) as int;
+    if (i < 0) {
+      i = 0;
+    } else if (i > dataList.length - 1) {
+      i = dataList.length - 1;
+    }
     int j = x / gridSize as int;
-    print("${i}, ${j}");
+    if (j < 0) {
+      j = 0;
+    } else if (j > dataList[0].length - 1) {
+      j = dataList.length - 1;
+    }
+    print("$i, $j");
     setState(() {
       dataList[i][j] ? dataList[i][j] = false : dataList[i][j] = true;
       drawCursor = false;
