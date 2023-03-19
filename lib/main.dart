@@ -287,10 +287,12 @@ class ActionButtons extends StatelessWidget {
 }
 
 class GridPainter extends CustomPainter {
-  double _canvasWidth = 0.0;
-  double _canvasHeight = 0.0;
-  double _gridSize = 0.0;
-  double _margin = 0.0;
+  late double _canvasWidth;
+  late double _canvasHeight;
+  late double _gridSize;
+  late double _margin;
+  late double _xMargin;
+  late double _yMargin;
   late List<List<bool>> _gridData;
 
   GridPainter(width, height, gridSize, margin, gridData) {
@@ -299,6 +301,8 @@ class GridPainter extends CustomPainter {
     _gridData = gridData;
     _gridSize = gridSize;
     _margin = margin;
+    _xMargin = margin * _canvasWidth;
+    _yMargin = margin * _canvasHeight;
   }
 
   @override
@@ -315,8 +319,8 @@ class GridPainter extends CustomPainter {
     List<Offset> dataPoints = [];
 
     for (int i = 0; i <= (_canvasHeight / _gridSize as int); i++) {
-      xv = _gridSize * i + _margin * _canvasWidth;
-      yh = _gridSize * i + _margin * _canvasHeight;
+      xv = _gridSize * i + _xMargin;
+      yh = _gridSize * i + _yMargin;
 
       //drawing the vertical grid line
       canvas.drawLine(
@@ -341,14 +345,14 @@ class GridPainter extends CustomPainter {
         canvas,
         Offset(
           xv - 7,
-          _canvasHeight / 2.0 + 5 + _margin * _canvasHeight,
+          _canvasHeight / 2.0 + 5 + _yMargin,
         ),
       ); // x-axis labels
 
       textPainter.paint(
         canvas,
         Offset(
-          -20 + _canvasWidth / 2.0 + _margin * _canvasHeight,
+          -20 + _canvasWidth / 2.0 + _yMargin,
           _canvasHeight * (1 + 2 * _margin) - yh - 7,
           // this last calculation is awkward but the first y label is -10 and
           // the last is +10, so what to do here...
@@ -361,8 +365,8 @@ class GridPainter extends CustomPainter {
             if (d)
               {
                 dataPoints.add(Offset(
-                  index * _gridSize + _margin * _canvasWidth,
-                  _canvasWidth - i * _gridSize + _margin * _canvasHeight,
+                  index * _gridSize + _xMargin,
+                  _canvasWidth - i * _gridSize + _yMargin,
                 ))
               }
           });
@@ -376,12 +380,12 @@ class GridPainter extends CustomPainter {
     // thick line for y-axis
     canvas.drawLine(
       Offset(
-        _canvasWidth / 2.0 + _margin * _canvasHeight,
-        -.05 * _canvasWidth + _margin * _canvasHeight,
+        _canvasWidth / 2.0 + _yMargin,
+        0,
       ),
       Offset(
-        _canvasWidth / 2.0 + _margin * _canvasHeight,
-        _canvasHeight * 1.05 + _margin * _canvasHeight,
+        _canvasWidth / 2.0 + _yMargin,
+        _canvasHeight + 2 * _yMargin,
         // change the 1.05 to margin + 1?
       ),
       paintAxes,
@@ -389,8 +393,8 @@ class GridPainter extends CustomPainter {
     textPainterY.paint(
       canvas,
       Offset(
-        _canvasWidth / 2.0 + _margin * _canvasHeight,
-        -45.0 + _margin * _canvasHeight,
+        _canvasWidth / 2.0 + _yMargin,
+        -45.0 + _yMargin,
       ),
     ); // draw label for y-axis
 
@@ -402,20 +406,20 @@ class GridPainter extends CustomPainter {
     // thick line for x-axis
     canvas.drawLine(
       Offset(
-        _canvasWidth * -.05 + _margin * _canvasHeight,
-        _canvasHeight / 2.0 + _margin * _canvasHeight,
+        0,
+        _canvasHeight / 2.0 + _yMargin,
       ),
       Offset(
-        _canvasWidth * 1.05 + _margin * _canvasHeight,
-        _canvasHeight / 2.0 + _margin * _canvasHeight,
+        _canvasWidth + 2 * _yMargin,
+        _canvasHeight / 2.0 + _yMargin,
       ),
       paintAxes,
     );
     textPainterX.paint(
       canvas,
       Offset(
-        _canvasWidth + 30 + _margin * _canvasHeight,
-        _canvasHeight / 2.0 + _margin * _canvasHeight,
+        _canvasWidth + 30 + _yMargin,
+        _canvasHeight / 2.0 + _yMargin,
       ),
     ); // draw the label for x-axis
 
