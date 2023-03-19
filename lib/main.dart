@@ -22,6 +22,7 @@ class _MainAppState extends State<MainApp> {
   _StdToSlopeIntData eqns = _StdToSlopeIntData();
   Map currentEquation = {};
   bool drawCursor = false;
+  bool tapUp = true;
 
   @override
   _MainAppState() {
@@ -58,9 +59,12 @@ class _MainAppState extends State<MainApp> {
       } else if (y > canvasHeight * (1 + margins)) {
         y = canvasHeight * (1 + margins);
       }
-      drawCursor = false;
+      if (!tapUp) {
+        drawCursor = true;
+      } else {
+        tapUp = false;
+      }
     });
-    //print((x/40).toString() + ", " + ((400-y)/40).toString());
   }
 
   void _toggleDataPoint(TapDownDetails details) {
@@ -169,17 +173,19 @@ class _MainAppState extends State<MainApp> {
                     width: canvasWidth * (1.0 + margins * 2),
                     height: canvasHeight * (1.0 + margins * 2),
                     child: MouseRegion(
-                      onHover: _updateLocation,
+                      //onHover: _updateLocation,
                       onExit: (p) {
                         setState(() => drawCursor = false);
                       },
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
                         onTapDown: _toggleDataPoint,
+                        //onTapUp: (d) => setState(() => {tapUp = true}),
+                        //onLongPressDown: (d) => print('long'),
                         child: CustomPaint(
                           foregroundPainter: CursorPainter(x, y, drawCursor),
                           /**
-                           * To do: add the margins into the GridPainter
+                           * DONE: add the margins into the GridPainter
                            * also the gesture detector needs to know the margins to
                            * trim them off the edges
                            * x, y = clickEvent offset minus the margin size
